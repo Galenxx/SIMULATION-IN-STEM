@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Mode - ML Playground</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="education-system.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+            padding-bottom: 140px;
+        }
+        
+        .quiz-header {
+            text-align: center;
+            padding: var(--space-3xl) 0;
+        }
+        
+        .quiz-header h1 {
+            margin-bottom: var(--space-sm);
+        }
+        
+        /* Lab Selection Grid */
+        .lab-selection {
+            margin-bottom: var(--space-3xl);
+        }
+        
+        .lab-selection-title {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+        
+        .lab-selection-title h2 {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lab-selection-title p {
+            color: var(--color-text-secondary);
+        }
+        
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .lab-quiz-card {
+            background: var(--color-bg-card);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lab-quiz-card:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .lab-quiz-card.completed {
+            border-color: var(--color-green);
+        }
+        
+        .lab-quiz-card.perfect {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, var(--color-bg-card) 100%);
+        }
+        
+        .lab-quiz-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+        }
+        
+        .lab-quiz-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .lab-quiz-desc {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .lab-quiz-progress {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .progress-bar-mini {
+            flex: 1;
+            height: 6px;
+            background: var(--color-surface);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .progress-bar-mini-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width var(--transition-base);
+        }
+        
+        .progress-bar-mini-fill.perfect {
+            background: linear-gradient(90deg, #ffd700, #ffb700);
+        }
+        
+        .progress-text {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--color-text-muted);
+            min-width: 40px;
+            text-align: right;
+        }
+        
+        .lab-quiz-badge {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            border-radius: 50%;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Quiz Progress */
+        .quiz-progress {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .progress-dot {
+            flex: 1;
+            height: 6px;
+            background: var(--color-surface);
+            border-radius: var(--radius-full);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: var(--gradient-primary);
+            transition: width var(--transition-base);
+        }
+        
+        .progress-dot.completed::after {
+            width: 100%;
+            background: var(--color-green);
+        }
+        
+        .progress-dot.current::after {
+            width: 100%;
+            background: var(--gradient-primary);
+        }
+        
+        .progress-dot.wrong::after {
+            width: 100%;
+            background: var(--color-red);
+        }
+        
+        /* Question Card */
+        .question-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            backdrop-filter: var(--glass-blur);
+            margin-bottom: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+        
+        .question-lab-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-xs) var(--space-md);
+            background: var(--glass-bg);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-md);
+        }
+        
+        .question-number {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-md);
+        }
+        
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xl);
+            line-height: 1.5;
+        }
+        
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .answer-option {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-option:hover:not(.disabled) {
+            border-color: var(--color-border-hover);
+            background: var(--color-surface);
+            transform: translateX(4px);
+        }
+        
+        .answer-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .answer-option.correct {
+            border-color: var(--color-green);
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .answer-option.incorrect {
+            border-color: var(--color-red);
+            background: rgba(255, 71, 87, 0.15);
+        }
+        
+        .answer-option.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+        
+        .answer-letter {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-surface);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .answer-option.selected .answer-letter {
+            background: #667eea;
+            color: white;
+        }
+        
+        .answer-option.correct .answer-letter {
+            background: var(--color-green);
+            color: white;
+        }
+        
+        .answer-option.incorrect .answer-letter {
+            background: var(--color-red);
+            color: white;
+        }
+        
+        .answer-text {
+            flex: 1;
+        }
+        
+        .explanation {
+            margin-top: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--color-green);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all var(--transition-base);
+            pointer-events: none;
+        }
+        
+        .explanation.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        
+        .explanation.incorrect {
+            border-left-color: var(--color-red);
+        }
+        
+        .explanation h4 {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .explanation h4.correct {
+            color: var(--color-green);
+        }
+        
+        .explanation h4.incorrect {
+            color: var(--color-red);
+        }
+        
+        .explanation p {
+            color: var(--color-text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+        
+        /* Quiz Actions */
+        .quiz-actions {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: space-between;
+        }
+        
+        .quiz-actions .btn {
+            min-width: 140px;
+        }
+        
+        /* Score Card */
+        .score-card {
+            text-align: center;
+            padding: var(--space-3xl);
+        }
+        
+        .score-visual {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto var(--space-xl);
+        }
+        
+        .score-ring {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .score-ring-bg {
+            fill: none;
+            stroke: var(--color-surface);
+            stroke-width: 12;
+        }
+        
+        .score-ring-fill {
+            fill: none;
+            stroke: url(#scoreGradient);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        
+        .score-ring-fill.perfect {
+            stroke: url(#goldGradient);
+        }
+        
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .score-value.perfect {
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        .score-label {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        
+        .score-message {
+            font-size: 1.25rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .score-submessage {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .badge-earned {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border: 2px solid #ffd700;
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-xl);
+            animation: badgeGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.5); }
+        }
+        
+        .badge-earned-icon {
+            font-size: 2.5rem;
+        }
+        
+        .badge-earned-text h4 {
+            color: #ffd700;
+            font-size: 1.125rem;
+        }
+        
+        .badge-earned-text p {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Back to Labs Link */
+        .back-to-selection {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: var(--space-lg);
+            transition: color var(--transition-fast);
+        }
+        
+        .back-to-selection:hover {
+            color: var(--color-text);
+        }
+        
+        /* View Gallery Button */
+        .view-gallery-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .view-gallery-btn svg {
+            transition: transform var(--transition-fast);
+        }
+        
+        .view-gallery-btn:hover svg {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <main class="quiz-container">
+        <header class="quiz-header">
+            <h1>Test Your Knowledge</h1>
+            <p style="color: var(--color-text-secondary);">Complete lab quizzes to earn badges and become an ML Grandmaster!</p>
+        </header>
+        
+        <!-- Lab Selection View -->
+        <div id="lab-selection-view">
+            <div class="lab-selection">
+                <div class="lab-selection-title">
+                    <h2>Choose a Lab Quiz</h2>
+                    <p>Each quiz has 5 questions. Score 5/5 to earn the badge!</p>
+                    <button class="btn btn-secondary view-gallery-btn magnetic" id="view-gallery-btn" style="margin-top: var(--space-lg);" onclick="openAchievementGallery()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        View Achievement Gallery
+                    </button>
+                </div>
+                <div class="lab-grid" id="lab-grid">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quiz View (Hidden by default) -->
+        <div id="quiz-view" style="display: none;">
+            <a href="#" class="back-to-selection" id="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Lab Selection
+            </a>
+            
+            <!-- Progress Bar -->
+            <div class="quiz-progress" id="quiz-progress">
+                <!-- Dots will be generated by JS -->
+            </div>
+            
+            <!-- Question Card -->
+            <div class="question-card" id="question-card">
+                <div class="question-lab-badge" id="question-lab-badge">
+                    <span>📈</span>
+                    <span>Linear Regression</span>
+                </div>
+                <div class="question-number" id="question-number">Question 1 of 5</div>
+                <div class="question-text" id="question-text">Loading question...</div>
+                
+                <div class="answers" id="answers">
+                    <!-- Answers will be generated by JS -->
+                </div>
+                
+                <div class="explanation" id="explanation">
+                    <h4 class="correct" id="explanation-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <span>Correct!</span>
+                    </h4>
+                    <p id="explanation-text"></p>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="quiz-actions">
+                <button class="btn btn-secondary magnetic" id="prev-btn" style="visibility: hidden;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Previous
+                </button>
+                <button class="btn btn-primary magnetic" id="next-btn" disabled>
+                    <span id="next-btn-text">Check Answer</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Score Card (Hidden initially) -->
+            <div class="question-card" id="score-card" style="display: none;">
+                <div class="score-card">
+                    <div class="score-visual">
+                        <svg class="score-ring" viewBox="0 0 160 160">
+                            <defs>
+                                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#667eea"/>
+                                    <stop offset="100%" stop-color="#764ba2"/>
+                                </linearGradient>
+                                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ffd700"/>
+                                    <stop offset="100%" stop-color="#ffb700"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="score-ring-bg" cx="80" cy="80" r="70"/>
+                            <circle class="score-ring-fill" id="score-ring-fill" cx="80" cy="80" r="70"/>
+                        </svg>
+                        <div class="score-text">
+                            <div class="score-value" id="score-percent">0/5</div>
+                            <div class="score-label">Score</div>
+                        </div>
+                    </div>
+                    
+                    <div class="badge-earned" id="badge-earned" style="display: none;">
+                        <div class="badge-earned-icon" id="badge-icon">🏆</div>
+                        <div class="badge-earned-text">
+                            <h4 id="badge-name">Badge Unlocked!</h4>
+                            <p id="badge-desc">You've mastered this topic!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="score-message" id="score-message">Great job!</div>
+                    <p class="score-submessage" id="score-submessage">Keep learning and practicing.</p>
+                    
+                    <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary magnetic" id="retry-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                            </svg>
+                            Try Again
+                        </button>
+                        <button class="btn btn-secondary magnetic" id="back-to-labs-btn">
+                            Choose Another Lab
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Confetti Canvas -->
+    <canvas class="confetti" id="confetti-canvas"></canvas>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>Supervised</span>
+                <div class="nav-dropdown">
+                    <a href="labs/linear-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📈</span>
+                        Linear Regression
+                    </a>
+                    <a href="labs/logistic-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📊</span>
+                        Logistic Regression
+                    </a>
+                    <a href="labs/decision-trees.html" class="dropdown-item">
+                        <span class="dropdown-icon">🌳</span>
+                        Decision Trees
+                    </a>
+                    <a href="labs/svm.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚡</span>
+                        SVM
+                    </a>
+                    <a href="labs/knn.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        KNN
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                <span>Unsupervised</span>
+                <div class="nav-dropdown">
+                    <a href="labs/kmeans.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎨</span>
+                        K-Means Clustering
+                    </a>
+                    <a href="labs/association.html" class="dropdown-item">
+                        <span class="dropdown-icon">🛒</span>
+                        Association Rules
+                    </a>
+                </div>
+            </div>
+            
+            <a href="quiz.html" class="nav-item active magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+    <script src="education-system.js"></script>
+    <script>
+        // ========================================
+        // Quiz Questions Database - 5 Questions per Lab
+        // ========================================
+        const labQuizzes = {
+            'linear-regression': {
+                icon: '📈',
+                name: 'Linear Regression',
+                badgeName: 'Line Finder',
+                badgeDesc: 'Mastered Linear Regression',
+                questions: [
+                    {
+                        question: "What does 'Least Squares' regression minimize?",
+                        answers: [
+                            "The sum of squared differences between actual and predicted values",
+                            "The number of data points",
+                            "The slope of the line",
+                            "The y-intercept value"
+                        ],
+                        correct: 0,
+                        explanation: "Least Squares regression finds the line that minimizes the sum of squared residuals (errors) between each data point and the predicted value on the line."
+                    },
+                    {
+                        question: "What does the slope (m) in y = mx + b represent?",
+                        answers: [
+                            "Where the line crosses the y-axis",
+                            "How much y changes for each unit change in x",
+                            "The total error of the model",
+                            "The number of data points"
+                        ],
+                        correct: 1,
+                        explanation: "The slope (m) represents the rate of change - for every 1 unit increase in x, y changes by m units. A positive slope means y increases as x increases."
+                    },
+                    {
+                        question: "What happens to a linear regression line when you add an outlier far from the data?",
+                        answers: [
+                            "The line stays exactly the same",
+                            "The line is pulled toward the outlier",
+                            "The line becomes curved",
+                            "The outlier is automatically removed"
+                        ],
+                        correct: 1,
+                        explanation: "Linear regression is sensitive to outliers because it minimizes squared errors. A single outlier far from the line creates a large squared error, pulling the line toward it."
+                    },
+                    {
+                        question: "What does an R² value of 0.95 indicate?",
+                        answers: [
+                            "The model has 95 data points",
+                            "The model explains 95% of the variance in the data",
+                            "The model is 95% accurate on predictions",
+                            "The slope is 0.95"
+                        ],
+                        correct: 1,
+                        explanation: "R² (coefficient of determination) measures how much of the variance in the dependent variable is explained by the model. 0.95 means 95% of the variation is captured."
+                    },
+                    {
+                        question: "What is gradient descent used for in linear regression?",
+                        answers: [
+                            "Creating new data points",
+                            "Removing outliers automatically",
+                            "Iteratively finding optimal slope and intercept values",
+                            "Converting categorical data to numerical"
+                        ],
+                        correct: 2,
+                        explanation: "Gradient descent is an optimization algorithm that iteratively adjusts the slope and intercept to minimize the error function, 'descending' toward the optimal solution."
+                    }
+                ]
+            },
+            'logistic-regression': {
+                icon: '📊',
+                name: 'Logistic Regression',
+                badgeName: 'Probability Pro',
+                badgeDesc: 'Mastered Logistic Regression',
+                questions: [
+                    {
+                        question: "What is the purpose of the Sigmoid function in Logistic Regression?",
+                        answers: [
+                            "To make the model run faster",
+                            "To convert outputs to probabilities between 0 and 1",
+                            "To increase the slope of the decision boundary",
+                            "To remove negative values from predictions"
+                        ],
+                        correct: 1,
+                        explanation: "The Sigmoid function σ(x) = 1/(1+e^(-x)) squashes any input to an output between 0 and 1, making it perfect for representing probabilities in binary classification."
+                    },
+                    {
+                        question: "What type of problems is Logistic Regression best suited for?",
+                        answers: [
+                            "Predicting continuous values like house prices",
+                            "Binary classification problems like Pass/Fail",
+                            "Clustering similar items together",
+                            "Generating new data samples"
+                        ],
+                        correct: 1,
+                        explanation: "Logistic Regression is designed for binary classification - predicting which of two categories something belongs to, such as spam/not spam or pass/fail."
+                    },
+                    {
+                        question: "What does the threshold value (often 0.5) determine?",
+                        answers: [
+                            "The steepness of the sigmoid curve",
+                            "The cutoff for classifying as positive or negative class",
+                            "The number of features to use",
+                            "The learning rate of the algorithm"
+                        ],
+                        correct: 1,
+                        explanation: "The threshold determines the classification boundary. If the predicted probability exceeds the threshold (e.g., 0.5), the sample is classified as the positive class."
+                    },
+                    {
+                        question: "How does increasing the weight (w) affect the sigmoid curve?",
+                        answers: [
+                            "Makes the curve flatter and more gradual",
+                            "Makes the curve steeper with sharper transition",
+                            "Shifts the curve left or right",
+                            "Has no effect on the curve shape"
+                        ],
+                        correct: 1,
+                        explanation: "Higher weight values make the sigmoid curve steeper, resulting in a sharper transition from 0 to 1 probability. This means predictions become more confident."
+                    },
+                    {
+                        question: "What does the bias (b) parameter control?",
+                        answers: [
+                            "The steepness of the curve",
+                            "The horizontal position of the decision boundary",
+                            "The maximum probability value",
+                            "The number of iterations"
+                        ],
+                        correct: 1,
+                        explanation: "The bias parameter shifts the sigmoid curve left or right, effectively moving where the 50% probability point occurs. This controls the decision boundary position."
+                    }
+                ]
+            },
+            'decision-trees': {
+                icon: '🌳',
+                name: 'Decision Trees',
+                badgeName: 'Tree Builder',
+                badgeDesc: 'Mastered Decision Trees',
+                questions: [
+                    {
+                        question: "What does 'Entropy' measure in decision trees?",
+                        answers: [
+                            "The speed of the algorithm",
+                            "The impurity or disorder in a dataset",
+                            "The number of branches in the tree",
+                            "The height of the tree"
+                        ],
+                        correct: 1,
+                        explanation: "Entropy measures impurity - how mixed the classes are. A pure node (all same class) has entropy 0, while a perfectly mixed node has maximum entropy."
+                    },
+                    {
+                        question: "What is 'Information Gain' used for?",
+                        answers: [
+                            "Measuring how much RAM the tree uses",
+                            "Deciding which feature to split on at each node",
+                            "Counting the total number of leaves",
+                            "Determining the tree depth limit"
+                        ],
+                        correct: 1,
+                        explanation: "Information Gain measures how much entropy decreases after splitting on a feature. The feature with the highest gain is chosen for the split."
+                    },
+                    {
+                        question: "What is 'pruning' in decision trees?",
+                        answers: [
+                            "Adding more branches to the tree",
+                            "Removing branches to prevent overfitting",
+                            "Changing the root node",
+                            "Sorting the data before training"
+                        ],
+                        correct: 1,
+                        explanation: "Pruning removes branches from a decision tree to prevent overfitting. A tree that's too deep may memorize training data but fail to generalize to new data."
+                    },
+                    {
+                        question: "What makes a 'leaf node' different from other nodes?",
+                        answers: [
+                            "It has the most data points",
+                            "It makes a final prediction without further splitting",
+                            "It's always the root of the tree",
+                            "It uses a different algorithm"
+                        ],
+                        correct: 1,
+                        explanation: "Leaf nodes are terminal nodes that make final predictions. They don't split further - when data reaches a leaf, it gets classified based on the majority class there."
+                    },
+                    {
+                        question: "Why might a decision tree 'overfit' the training data?",
+                        answers: [
+                            "The tree has too few branches",
+                            "The tree has too many branches, memorizing noise",
+                            "The features are too simple",
+                            "The dataset is too large"
+                        ],
+                        correct: 1,
+                        explanation: "Overfitting occurs when a tree grows too deep, creating branches for noise and outliers. It performs perfectly on training data but poorly on new data."
+                    }
+                ]
+            },
+            'svm': {
+                icon: '⚡',
+                name: 'Support Vector Machines',
+                badgeName: 'Margin Maximizer',
+                badgeDesc: 'Mastered SVM',
+                questions: [
+                    {
+                        question: "What are 'Support Vectors' in SVM?",
+                        answers: [
+                            "All points in the dataset",
+                            "The points closest to the decision boundary",
+                            "The centroid of each class",
+                            "Randomly selected sample points"
+                        ],
+                        correct: 1,
+                        explanation: "Support Vectors are the data points closest to the decision boundary (hyperplane). They 'support' or define the boundary position. Moving only these points changes the boundary!"
+                    },
+                    {
+                        question: "What does SVM try to maximize?",
+                        answers: [
+                            "The number of support vectors",
+                            "The margin (distance) between classes",
+                            "The number of correctly classified points",
+                            "The complexity of the boundary"
+                        ],
+                        correct: 1,
+                        explanation: "SVM finds the decision boundary that maximizes the margin - the 'street width' between the two classes. A wider margin typically means better generalization."
+                    },
+                    {
+                        question: "What does the C parameter control in SVM?",
+                        answers: [
+                            "The color of the decision boundary",
+                            "The trade-off between margin width and classification errors",
+                            "The number of support vectors allowed",
+                            "The kernel function type"
+                        ],
+                        correct: 1,
+                        explanation: "C controls the trade-off: Low C allows more errors for a wider margin (soft margin). High C strictly minimizes errors, creating a narrower margin (hard margin)."
+                    },
+                    {
+                        question: "When would you use an RBF (Gaussian) kernel instead of linear?",
+                        answers: [
+                            "When you want faster training",
+                            "When data is not linearly separable (e.g., circular patterns)",
+                            "When you have very few data points",
+                            "When features are categorical"
+                        ],
+                        correct: 1,
+                        explanation: "RBF kernel allows SVM to create curved, non-linear decision boundaries. It's useful when classes can't be separated by a straight line, like circular or spiral patterns."
+                    },
+                    {
+                        question: "What happens when you move a non-support vector point?",
+                        answers: [
+                            "The decision boundary shifts significantly",
+                            "The margin width changes",
+                            "Nothing - the boundary stays the same",
+                            "New support vectors are created"
+                        ],
+                        correct: 2,
+                        explanation: "Only support vectors determine the boundary. Moving points that aren't support vectors (internal points) has no effect on the decision boundary."
+                    }
+                ]
+            },
+            'knn': {
+                icon: '🎯',
+                name: 'K-Nearest Neighbors',
+                badgeName: 'Neighbor Expert',
+                badgeDesc: 'Mastered KNN',
+                questions: [
+                    {
+                        question: "How does KNN classify a new data point?",
+                        answers: [
+                            "By fitting a mathematical equation",
+                            "By finding K closest points and majority voting",
+                            "By building a decision tree",
+                            "By calculating cluster centroids"
+                        ],
+                        correct: 1,
+                        explanation: "KNN finds the K nearest neighbors to the query point and lets them 'vote' - the majority class among those neighbors becomes the prediction."
+                    },
+                    {
+                        question: "What happens when you increase the value of K?",
+                        answers: [
+                            "The model becomes more sensitive to outliers",
+                            "The decision boundary becomes smoother",
+                            "The model always becomes more accurate",
+                            "The algorithm runs faster"
+                        ],
+                        correct: 1,
+                        explanation: "Higher K considers more neighbors, averaging out noise and creating smoother boundaries. However, too high K can cause underfitting by ignoring local patterns."
+                    },
+                    {
+                        question: "Why are odd values of K often preferred?",
+                        answers: [
+                            "They make the algorithm faster",
+                            "They prevent ties in binary classification voting",
+                            "They are mathematically more stable",
+                            "They use less memory"
+                        ],
+                        correct: 1,
+                        explanation: "In binary classification, odd K values prevent ties in voting. With K=4, you could get 2-2 votes, but K=3 or K=5 ensures a clear majority winner."
+                    },
+                    {
+                        question: "What distance metric is commonly used in KNN?",
+                        answers: [
+                            "Manhattan distance only",
+                            "Euclidean distance (straight-line distance)",
+                            "Angular distance",
+                            "Hamming distance"
+                        ],
+                        correct: 1,
+                        explanation: "Euclidean distance (√(Σ(xi-yi)²)) is the most common metric, measuring straight-line distance between points. Other metrics like Manhattan can be used depending on the problem."
+                    },
+                    {
+                        question: "Why is KNN called a 'lazy learner'?",
+                        answers: [
+                            "It makes random predictions",
+                            "It doesn't build a model during training, only stores data",
+                            "It works slowly",
+                            "It requires little data"
+                        ],
+                        correct: 1,
+                        explanation: "KNN is 'lazy' because it does no training - it simply stores all training data. All computation happens at prediction time when finding nearest neighbors."
+                    }
+                ]
+            },
+            'kmeans': {
+                icon: '🎨',
+                name: 'K-Means Clustering',
+                badgeName: 'Cluster Champion',
+                badgeDesc: 'Mastered K-Means',
+                questions: [
+                    {
+                        question: "What type of learning is K-Means clustering?",
+                        answers: [
+                            "Supervised learning with labeled data",
+                            "Unsupervised learning without labels",
+                            "Reinforcement learning",
+                            "Semi-supervised learning"
+                        ],
+                        correct: 1,
+                        explanation: "K-Means is unsupervised - it finds patterns in data without any labels. It groups similar data points together based on their features, discovering structure on its own."
+                    },
+                    {
+                        question: "What determines when K-Means stops iterating?",
+                        answers: [
+                            "After exactly 100 iterations",
+                            "When all points change clusters",
+                            "When centroids stop moving significantly",
+                            "When the user clicks stop"
+                        ],
+                        correct: 2,
+                        explanation: "K-Means converges when centroids stabilize - they stop moving (or move very little) between iterations, meaning cluster assignments have settled."
+                    },
+                    {
+                        question: "What is the 'Assign' step in K-Means?",
+                        answers: [
+                            "Moving centroids to cluster centers",
+                            "Assigning each point to its nearest centroid",
+                            "Choosing the initial centroid positions",
+                            "Calculating the final cluster labels"
+                        ],
+                        correct: 1,
+                        explanation: "In the Assign step, each data point is assigned to the cluster whose centroid is nearest. Points 'turn the color' of their closest centroid."
+                    },
+                    {
+                        question: "What is the 'Update' step in K-Means?",
+                        answers: [
+                            "Adding new data points",
+                            "Removing outliers",
+                            "Moving each centroid to the mean of its assigned points",
+                            "Increasing the number of clusters"
+                        ],
+                        correct: 2,
+                        explanation: "In the Update step, each centroid moves to the center (mean position) of all points currently assigned to it. This is why it's called K-MEANS."
+                    },
+                    {
+                        question: "Why might different runs of K-Means give different results?",
+                        answers: [
+                            "The algorithm is broken",
+                            "Random initial centroid placement affects the final clusters",
+                            "The data changes each time",
+                            "K-Means can only run once"
+                        ],
+                        correct: 1,
+                        explanation: "K-Means results depend on initial centroid positions. Different random starts can lead to different local optima. Running multiple times with different starts is common."
+                    }
+                ]
+            },
+            'association': {
+                icon: '🛒',
+                name: 'Association Rules',
+                badgeName: 'Pattern Finder',
+                badgeDesc: 'Mastered Association Rules',
+                questions: [
+                    {
+                        question: "What does 'Support' measure in association rules?",
+                        answers: [
+                            "How much we trust the rule",
+                            "How often items appear together in all transactions",
+                            "The profit from selling items",
+                            "Customer satisfaction level"
+                        ],
+                        correct: 1,
+                        explanation: "Support measures the frequency of an itemset in the dataset. Support(A,B) = (transactions containing both A and B) / (total transactions)."
+                    },
+                    {
+                        question: "What does 'Confidence' measure for rule A → B?",
+                        answers: [
+                            "How often B appears in all transactions",
+                            "How likely B is purchased when A is purchased",
+                            "The popularity of item A",
+                            "The price correlation between A and B"
+                        ],
+                        correct: 1,
+                        explanation: "Confidence measures the conditional probability. Confidence(A→B) = Support(A,B) / Support(A). It tells us: given A was bought, how often was B also bought?"
+                    },
+                    {
+                        question: "What does a Lift value greater than 1 indicate?",
+                        answers: [
+                            "The items are unrelated",
+                            "The items are positively correlated (bought together more than expected)",
+                            "The items should never be placed together",
+                            "The rule is invalid"
+                        ],
+                        correct: 1,
+                        explanation: "Lift > 1 means positive correlation - items are bought together more than random chance. Lift = 1 means independent. Lift < 1 means negative correlation."
+                    },
+                    {
+                        question: "What is the famous 'Beer and Diapers' example about?",
+                        answers: [
+                            "Baby products being placed far from alcohol",
+                            "Unexpected association between items bought together",
+                            "The best placement for baby products",
+                            "A failed marketing campaign"
+                        ],
+                        correct: 1,
+                        explanation: "The Beer & Diapers story illustrates how association rule mining found that fathers buying diapers often also bought beer - an unexpected pattern useful for store layout and marketing."
+                    },
+                    {
+                        question: "Why do we need minimum support and confidence thresholds?",
+                        answers: [
+                            "To make the algorithm run faster",
+                            "To filter out rare or weak rules that aren't useful",
+                            "To increase the number of rules found",
+                            "To ensure all items are included"
+                        ],
+                        correct: 1,
+                        explanation: "Thresholds filter out rules that are too rare (low support) or too unreliable (low confidence). Without them, we'd get millions of useless rules."
+                    }
+                ]
+            }
+        };
+
+        // ========================================
+        // Quiz State
+        // ========================================
+        let currentLab = null;
+        let currentQuestion = 0;
+        let selectedAnswer = null;
+        let answered = false;
+        let score = 0;
+        let results = [];
+
+        // ========================================
+        // Confetti Animation
+        // ========================================
+        class Confetti {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.colors = ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#ec4899', '#ffd700'];
+                this.active = false;
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            createParticles() {
+                this.particles = [];
+                for (let i = 0; i < 150; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height - this.canvas.height,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: Math.random() * 3 + 2,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        size: Math.random() * 8 + 4,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: (Math.random() - 0.5) * 10
+                    });
+                }
+            }
+            
+            animate() {
+                if (!this.active) return;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                let activeParticles = 0;
+                this.particles.forEach(p => {
+                    if (p.y < this.canvas.height + 50) {
+                        activeParticles++;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.1;
+                        p.rotation += p.rotationSpeed;
+                        
+                        this.ctx.save();
+                        this.ctx.translate(p.x, p.y);
+                        this.ctx.rotate(p.rotation * Math.PI / 180);
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        this.ctx.restore();
+                    }
+                });
+                
+                if (activeParticles > 0) {
+                    requestAnimationFrame(() => this.animate());
+                } else {
+                    this.active = false;
+                }
+            }
+            
+            fire() {
+                this.resize();
+                this.createParticles();
+                this.active = true;
+                this.animate();
+            }
+        }
+        
+        const confetti = new Confetti(document.getElementById('confetti-canvas'));
+
+        // ========================================
+        // UI Functions
+        // ========================================
+        function getProgress() {
+            const saved = localStorage.getItem('ml_playground_progress');
+            return saved ? JSON.parse(saved) : { completedLabs: {}, totalQuizAttempts: 0, achievements: [] };
+        }
+        
+        function saveQuizResult(labId, quizScore) {
+            const progress = getProgress();
+            
+            if (!progress.completedLabs[labId]) {
+                progress.completedLabs[labId] = { score: 0, perfect: false };
+            }
+            
+            const labProgress = progress.completedLabs[labId];
+            
+            // Only update if new score is higher
+            if (quizScore > labProgress.score) {
+                labProgress.score = quizScore;
+            }
+            
+            // Mark as perfect if score is 5
+            if (quizScore === 5) {
+                labProgress.perfect = true;
+            }
+            
+            progress.totalQuizAttempts = (progress.totalQuizAttempts || 0) + 1;
+            
+            localStorage.setItem('ml_playground_progress', JSON.stringify(progress));
+        }
+
+        function renderLabSelection() {
+            const grid = document.getElementById('lab-grid');
+            const progress = getProgress();
+            
+            grid.innerHTML = Object.entries(labQuizzes).map(([labId, lab]) => {
+                const labProgress = progress.completedLabs[labId] || { score: 0, perfect: false };
+                const isPerfect = labProgress.perfect;
+                const scorePercent = (labProgress.score / 5) * 100;
+                
+                return `
+                    <div class="lab-quiz-card ${isPerfect ? 'perfect' : (labProgress.score > 0 ? 'completed' : '')}" 
+                         data-lab="${labId}">
+                        ${isPerfect ? `<div class="lab-quiz-badge">${lab.icon}</div>` : ''}
+                        <div class="lab-quiz-icon">${lab.icon}</div>
+                        <div class="lab-quiz-name">${lab.name}</div>
+                        <div class="lab-quiz-desc">5 questions • ${isPerfect ? 'Badge Earned!' : 'Earn the badge'}</div>
+                        <div class="lab-quiz-progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-bar-mini-fill ${isPerfect ? 'perfect' : ''}" style="width: ${scorePercent}%"></div>
+                            </div>
+                            <span class="progress-text">${labProgress.score}/5</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers
+            grid.querySelectorAll('.lab-quiz-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    startQuiz(card.dataset.lab);
+                });
+            });
+        }
+
+        function startQuiz(labId) {
+            currentLab = labId;
+            currentQuestion = 0;
+            selectedAnswer = null;
+            answered = false;
+            score = 0;
+            results = new Array(5).fill(null);
+            
+            // Show quiz view
+            document.getElementById('lab-selection-view').style.display = 'none';
+            document.getElementById('quiz-view').style.display = 'block';
+            document.getElementById('question-card').style.display = 'block';
+            document.getElementById('score-card').style.display = 'none';
+            document.querySelector('.quiz-actions').style.display = 'flex';
+            
+            // Create progress dots
+            const progressContainer = document.getElementById('quiz-progress');
+            progressContainer.innerHTML = Array(5).fill(0).map((_, i) => 
+                `<div class="progress-dot ${i === 0 ? 'current' : ''}" data-index="${i}"></div>`
+            ).join('');
+            
+            showQuestion(0);
+        }
+
+        function showQuestion(index) {
+            currentQuestion = index;
+            
+            const lab = labQuizzes[currentLab];
+            const q = lab.questions[index];
+            
+            // Check if this question was already answered
+            const wasAnswered = results[index] !== null;
+            answered = wasAnswered;
+            selectedAnswer = wasAnswered ? (results[index] ? q.correct : null) : null;
+            
+            // Update progress
+            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+                dot.classList.remove('current', 'completed', 'wrong');
+                if (results[i] !== null) {
+                    dot.classList.add(results[i] ? 'completed' : 'wrong');
+                }
+                if (i === index && !wasAnswered) dot.classList.add('current');
+            });
+            
+            // Update lab badge
+            document.getElementById('question-lab-badge').innerHTML = `
+                <span>${lab.icon}</span>
+                <span>${lab.name}</span>
+            `;
+            
+            // Update question
+            document.getElementById('question-number').textContent = `Question ${index + 1} of 5`;
+            document.getElementById('question-text').textContent = q.question;
+            
+            // Update answers
+            const answersContainer = document.getElementById('answers');
+            answersContainer.innerHTML = q.answers.map((answer, i) => `
+                <div class="answer-option" data-index="${i}">
+                    <div class="answer-letter">${String.fromCharCode(65 + i)}</div>
+                    <div class="answer-text">${answer}</div>
+                </div>
+            `).join('');
+            
+            // Add click handlers
+            answersContainer.querySelectorAll('.answer-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    if (!answered) selectAnswer(parseInt(option.dataset.index));
+                });
+            });
+            
+            // If already answered, show the previous state
+            if (wasAnswered) {
+                const isCorrect = results[index];
+                document.querySelectorAll('.answer-option').forEach((option, i) => {
+                    option.classList.add('disabled');
+                    if (i === q.correct) {
+                        option.classList.add('correct');
+                    }
+                });
+                
+                // Show explanation
+                const explanation = document.getElementById('explanation');
+                const header = document.getElementById('explanation-header');
+                
+                if (isCorrect) {
+                    header.className = 'correct';
+                    header.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <span>Correct!</span>
+                    `;
+                    explanation.classList.remove('incorrect');
+                } else {
+                    header.className = 'incorrect';
+                    header.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <span>Not quite!</span>
+                    `;
+                    explanation.classList.add('incorrect');
+                }
+                
+                document.getElementById('explanation-text').textContent = q.explanation;
+                explanation.classList.add('visible');
+                
+                // Update button text
+                document.getElementById('next-btn').disabled = false;
+                document.getElementById('next-btn-text').textContent = 
+                    index < 4 ? 'Next Question' : 'See Results';
+            } else {
+                // Animate answers for new questions
+                if (typeof gsap !== 'undefined') {
+                    gsap.fromTo(answersContainer.querySelectorAll('.answer-option'),
+                        { opacity: 0, x: -20 },
+                        { opacity: 1, x: 0, duration: 0.3, stagger: 0.1, ease: 'power2.out' }
+                    );
+                }
+                
+                // Hide explanation
+                const explanation = document.getElementById('explanation');
+                explanation.classList.remove('visible', 'incorrect');
+                
+                // Update buttons
+                document.getElementById('next-btn').disabled = true;
+                document.getElementById('next-btn-text').textContent = 'Check Answer';
+            }
+            
+            document.getElementById('prev-btn').style.visibility = index > 0 ? 'visible' : 'hidden';
+        }
+
+        function selectAnswer(index) {
+            if (answered) return;
+            selectedAnswer = index;
+            
+            document.querySelectorAll('.answer-option').forEach((option, i) => {
+                option.classList.toggle('selected', i === index);
+            });
+            
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function checkAnswer() {
+            // Prevent re-checking already answered questions
+            if (selectedAnswer === null || results[currentQuestion] !== null) return;
+            
+            answered = true;
+            const q = labQuizzes[currentLab].questions[currentQuestion];
+            const isCorrect = selectedAnswer === q.correct;
+            
+            results[currentQuestion] = isCorrect;
+            if (isCorrect) score++;
+            
+            // Update progress dot
+            const progressDot = document.querySelectorAll('.progress-dot')[currentQuestion];
+            progressDot.classList.remove('current');
+            progressDot.classList.add(isCorrect ? 'completed' : 'wrong');
+            
+            // Show correct/incorrect
+            document.querySelectorAll('.answer-option').forEach((option, i) => {
+                option.classList.add('disabled');
+                if (i === q.correct) {
+                    option.classList.add('correct');
+                } else if (i === selectedAnswer && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Show explanation
+            const explanation = document.getElementById('explanation');
+            const header = document.getElementById('explanation-header');
+            
+            if (isCorrect) {
+                header.className = 'correct';
+                header.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <span>Correct!</span>
+                `;
+                explanation.classList.remove('incorrect');
+            } else {
+                header.className = 'incorrect';
+                header.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <span>Not quite!</span>
+                `;
+                explanation.classList.add('incorrect');
+            }
+            
+            document.getElementById('explanation-text').textContent = q.explanation;
+            explanation.classList.add('visible');
+            
+            // Update button
+            document.getElementById('next-btn-text').textContent = 
+                currentQuestion < 4 ? 'Next Question' : 'See Results';
+        }
+
+        function nextQuestion() {
+            // If not answered yet and no previous result, check the answer first
+            if (!answered && results[currentQuestion] === null) {
+                checkAnswer();
+                return;
+            }
+            
+            if (currentQuestion < 4) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('question-card').style.display = 'none';
+            document.querySelector('.quiz-actions').style.display = 'none';
+            
+            const scoreCard = document.getElementById('score-card');
+            scoreCard.style.display = 'block';
+            
+            const lab = labQuizzes[currentLab];
+            const isPerfect = score === 5;
+            
+            // Save result directly to localStorage (fallback)
+            saveQuizResult(currentLab, score);
+            
+            // Record result in achievement system (for notifications)
+            if (window.achievementSystem) {
+                window.achievementSystem.recordQuizResult(currentLab, score, 5);
+            }
+            
+            // Update score display
+            document.getElementById('score-percent').textContent = `${score}/5`;
+            document.getElementById('score-percent').className = `score-value ${isPerfect ? 'perfect' : ''}`;
+            
+            // Animate ring
+            const circumference = 2 * Math.PI * 70;
+            const offset = circumference - (score / 5) * circumference;
+            const ring = document.getElementById('score-ring-fill');
+            ring.style.strokeDasharray = circumference;
+            ring.style.strokeDashoffset = circumference;
+            ring.className = `score-ring-fill ${isPerfect ? 'perfect' : ''}`;
+            
+            setTimeout(() => {
+                ring.style.strokeDashoffset = offset;
+            }, 300);
+            
+            // Show badge if perfect
+            const badgeEarned = document.getElementById('badge-earned');
+            if (isPerfect) {
+                badgeEarned.style.display = 'flex';
+                document.getElementById('badge-icon').textContent = lab.icon;
+                document.getElementById('badge-name').textContent = lab.badgeName + ' Badge Unlocked!';
+                document.getElementById('badge-desc').textContent = lab.badgeDesc;
+                confetti.fire();
+            } else {
+                badgeEarned.style.display = 'none';
+            }
+            
+            // Set message
+            let message, submessage;
+            if (isPerfect) {
+                message = "Perfect Score! 🎉";
+                submessage = `You've earned the ${lab.badgeName} badge!`;
+            } else if (score >= 4) {
+                message = "Almost There! 🌟";
+                submessage = "One more correct answer and you'll earn the badge!";
+            } else if (score >= 3) {
+                message = "Good Progress! 👍";
+                submessage = "Review the lab materials and try again.";
+            } else {
+                message = "Keep Learning! 📚";
+                submessage = "Practice in the lab first, then come back.";
+            }
+            
+            document.getElementById('score-message').textContent = message;
+            document.getElementById('score-submessage').textContent = submessage;
+        }
+
+        function backToSelection() {
+            document.getElementById('lab-selection-view').style.display = 'block';
+            document.getElementById('quiz-view').style.display = 'none';
+            renderLabSelection();
+        }
+
+        // ========================================
+        // Event Listeners
+        // ========================================
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+        });
+        document.getElementById('back-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            backToSelection();
+        });
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            startQuiz(currentLab);
+        });
+        document.getElementById('back-to-labs-btn').addEventListener('click', backToSelection);
+
+        // ========================================
+        // Achievement Gallery Function
+        // ========================================
+        function openAchievementGallery() {
+            console.log('Opening Achievement Gallery...');
+            console.log('achievementSystem:', window.achievementSystem);
+            
+            if (window.achievementSystem && window.achievementSystem.modal) {
+                window.achievementSystem.showModal();
+            } else {
+                // Fallback: Create a simple modal if achievementSystem is not available
+                showFallbackAchievementModal();
+            }
+        }
+        
+        function showFallbackAchievementModal() {
+            // Check if modal already exists
+            let modal = document.getElementById('fallback-achievement-modal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'fallback-achievement-modal';
+                modal.className = 'achievement-modal';
+                modal.innerHTML = `
+                    <div class="achievement-modal-content">
+                        <div class="achievement-modal-header">
+                            <h2>🏆 Achievement Gallery</h2>
+                            <button class="achievement-modal-close" onclick="closeFallbackModal()">&times;</button>
+                        </div>
+                        <div class="achievement-modal-body">
+                            <div class="achievement-overview">
+                                <div class="achievement-overview-stats">
+                                    <div class="overview-stat">
+                                        <span class="overview-stat-value" id="fallback-unlocked">0</span>
+                                        <span class="overview-stat-label">Badges Earned</span>
+                                    </div>
+                                    <div class="overview-divider"></div>
+                                    <div class="overview-stat">
+                                        <span class="overview-stat-value" id="fallback-remaining">8</span>
+                                        <span class="overview-stat-label">Remaining</span>
+                                    </div>
+                                </div>
+                                <div class="achievement-progress-bar">
+                                    <div class="achievement-progress-fill" id="fallback-progress" style="width: 0%"></div>
+                                    <span class="achievement-progress-text" id="fallback-progress-text">0/8 Complete</span>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-grandmaster locked">
+                                <div class="grandmaster-icon-wrapper">
+                                    <div class="grandmaster-icon">🔒</div>
+                                </div>
+                                <div class="grandmaster-info">
+                                    <h3>??? Ultimate Achievement ???</h3>
+                                    <p>Complete all 7 labs with perfect quiz scores to unlock</p>
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-section">
+                                <h3 class="achievement-section-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                    Lab Badges
+                                </h3>
+                                <div class="achievement-grid" id="fallback-badges-grid">
+                                </div>
+                            </div>
+                            
+                            <div class="achievement-footer">
+                                <p>🚀 Complete lab quizzes with perfect scores to start earning badges!</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Close on backdrop click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeFallbackModal();
+                });
+            }
+            
+            // Update content with current progress
+            updateFallbackModal();
+            
+            // Show modal
+            modal.classList.add('active');
+        }
+        
+        function updateFallbackModal() {
+            const progress = getProgress();
+            const labs = Object.keys(labQuizzes);
+            let unlockedCount = 0;
+            
+            // Count unlocked badges
+            labs.forEach(labId => {
+                if (progress.completedLabs[labId]?.perfect) {
+                    unlockedCount++;
+                }
+            });
+            
+            // Update stats
+            document.getElementById('fallback-unlocked').textContent = unlockedCount;
+            document.getElementById('fallback-remaining').textContent = 8 - unlockedCount;
+            document.getElementById('fallback-progress').style.width = `${(unlockedCount / 8) * 100}%`;
+            document.getElementById('fallback-progress-text').textContent = `${unlockedCount}/8 Complete`;
+            
+            // Render badges
+            const badgesGrid = document.getElementById('fallback-badges-grid');
+            badgesGrid.innerHTML = labs.map(labId => {
+                const lab = labQuizzes[labId];
+                const labProgress = progress.completedLabs[labId] || { score: 0, perfect: false };
+                const isUnlocked = labProgress.perfect;
+                const scorePercent = (labProgress.score / 5) * 100;
+                
+                return `
+                    <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                        <div class="achievement-card-icon" style="background: ${isUnlocked ? getLabColor(labId) : 'linear-gradient(135deg, #2a2a3a 0%, #1a1a24 100%)'}">
+                            <span>${lab.icon}</span>
+                        </div>
+                        <div class="achievement-card-info">
+                            <h4>${isUnlocked ? lab.badgeName : '???'}</h4>
+                            <p>${isUnlocked ? 'Master ' + lab.name : 'Complete the quiz with a perfect score'}</p>
+                            ${isUnlocked 
+                                ? '<span class="achievement-status"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Unlocked!</span>' 
+                                : `<span class="achievement-status"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> ${labProgress.score}/5 correct</span>
+                                   <div class="achievement-progress-mini">
+                                       <div class="achievement-progress-mini-fill" style="width: ${scorePercent}%"></div>
+                                   </div>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getLabColor(labId) {
+            const colors = {
+                'linear-regression': '#3b82f6',
+                'logistic-regression': '#10b981',
+                'decision-trees': '#22c55e',
+                'svm': '#f59e0b',
+                'knn': '#ef4444',
+                'kmeans': '#8b5cf6',
+                'association': '#ec4899'
+            };
+            return colors[labId] || '#667eea';
+        }
+        
+        function closeFallbackModal() {
+            const modal = document.getElementById('fallback-achievement-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // ========================================
+        // Initialize
+        // ========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLabSelection();
+        });
+    </script>
+</body>
+</html>

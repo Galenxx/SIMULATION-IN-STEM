@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Vector Machines Lab - ML Playground</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../education-system.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* SVM Lab specific styles */
+        .kernel-toggle {
+            display: flex;
+            gap: 0;
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            padding: 4px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .kernel-btn {
+            flex: 1;
+            padding: var(--space-md);
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .kernel-btn:hover {
+            color: var(--color-text);
+        }
+        
+        .kernel-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .margin-display {
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+        
+        .margin-value {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .margin-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: var(--space-xs);
+        }
+        
+        .margin-visual {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: var(--color-surface);
+            border-radius: var(--radius-sm);
+        }
+        
+        .margin-line {
+            flex: 1;
+            height: 4px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: var(--radius-full);
+            position: relative;
+        }
+        
+        .margin-line::before,
+        .margin-line::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .margin-line::before {
+            left: -6px;
+            background: var(--color-red);
+        }
+        
+        .margin-line::after {
+            right: -6px;
+            background: var(--color-blue);
+        }
+        
+        .sv-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .sv-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--color-yellow);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        
+        .sv-text {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .sv-count {
+            font-family: var(--font-mono);
+            color: var(--color-yellow);
+            font-weight: 600;
+        }
+        
+        .c-param-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .c-param-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            margin-top: var(--space-xs);
+        }
+        
+        .class-selector {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .class-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .class-btn:hover {
+            border-color: var(--color-border-hover);
+        }
+        
+        .class-btn.red.active {
+            background: rgba(255, 71, 87, 0.2);
+            border-color: var(--color-red);
+            color: var(--color-red);
+        }
+        
+        .class-btn.blue.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--color-blue);
+            color: var(--color-blue);
+        }
+        
+        .class-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .class-dot.red { background: var(--color-red); }
+        .class-dot.blue { background: var(--color-blue); }
+        
+        .accuracy-display {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+        }
+        
+        .accuracy-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .accuracy-value.good { color: var(--color-green); }
+        .accuracy-value.ok { color: var(--color-yellow); }
+        .accuracy-value.bad { color: var(--color-red); }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="lab-layout">
+        <header class="lab-header">
+            <div class="lab-breadcrumb">
+                <a href="../index.html">Home</a>
+                <span>/</span>
+                <a href="../index.html#labs">Labs</a>
+                <span>/</span>
+                <span>Support Vector Machines</span>
+            </div>
+            <h1>Support Vector Machines Lab</h1>
+            <p>Find the widest "street" that separates two classes</p>
+        </header>
+        
+        <section class="canvas-container">
+            <div class="canvas-header">
+                <span class="canvas-title">SVM Playground</span>
+                <div class="canvas-actions">
+                    <button class="canvas-btn" data-preset="separable">
+                        Separable Data
+                    </button>
+                    <button class="canvas-btn" data-preset="overlap">
+                        Overlapping
+                    </button>
+                    <button class="canvas-btn" data-preset="circular">
+                        Circular
+                    </button>
+                    <button class="canvas-btn" data-action="clear">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <canvas id="main-canvas" class="main-canvas"></canvas>
+        </section>
+        
+        <aside class="dashboard">
+            <!-- Guide - NOW AT TOP -->
+            <div class="panel guide-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📖 User Guide</span>
+                </div>
+                <div class="narrative">
+                    <div class="narrative-step active">
+                        <h3>The "Widest Street" Problem</h3>
+                        <p>SVM finds the decision boundary (line) that maximizes the <strong>margin</strong> - the "street" between classes.</p>
+                        <p><strong>Support Vectors</strong> (gold ring) are the critical points that define the boundary. Only they matter!</p>
+                        <p><strong>Try this:</strong></p>
+                        <ul style="color: var(--color-text-secondary); margin-left: 1.5rem; font-size: 0.9rem;">
+                            <li>Drag a support vector - watch the line move</li>
+                            <li>Drag an internal point - nothing happens!</li>
+                            <li>Try "Circular" preset with RBF kernel</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Class Selector -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🎨 Add Points</span>
+                </div>
+                <div class="panel-content">
+                    <div class="class-selector">
+                        <button class="class-btn red active" data-class="red">
+                            <span class="class-dot red"></span>
+                            Class A
+                        </button>
+                        <button class="class-btn blue" data-class="blue">
+                            <span class="class-dot blue"></span>
+                            Class B
+                        </button>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--color-text-muted); text-align: center;">
+                        Click to add points. <strong>Drag support vectors</strong> (gold ring) to adjust the boundary!
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Kernel Toggle -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">⚙️ Kernel Function</span>
+                </div>
+                <div class="panel-content">
+                    <div class="kernel-toggle">
+                        <button class="kernel-btn active" data-kernel="linear">Linear</button>
+                        <button class="kernel-btn" data-kernel="rbf">RBF (Gaussian)</button>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--color-text-muted);" id="kernel-description">
+                        <strong>Linear:</strong> Creates a straight line boundary. Best for linearly separable data.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Margin Display -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">📏 Margin Width</span>
+                </div>
+                <div class="panel-content">
+                    <div class="margin-display">
+                        <div class="margin-value" id="margin-value">0.00</div>
+                        <div class="margin-label">Street Width</div>
+                        <div class="margin-visual">
+                            <span style="font-size: 0.7rem; color: var(--color-red);">A</span>
+                            <div class="margin-line" id="margin-visual-line"></div>
+                            <span style="font-size: 0.7rem; color: var(--color-blue);">B</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sv-indicator">
+                        <div class="sv-dot"></div>
+                        <div class="sv-text">
+                            <strong class="sv-count" id="sv-count">0</strong> Support Vectors
+                            <br><span style="font-size: 0.7rem;">Points that define the boundary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- C Parameter -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🎚️ C Parameter</span>
+                </div>
+                <div class="panel-content">
+                    <div class="c-param-display">
+                        <span style="font-size: 0.8rem;">Regularization</span>
+                        <span class="slider-value" id="c-value">1.00</span>
+                    </div>
+                    <input type="range" id="c-slider" min="-2" max="2" step="0.1" value="0">
+                    <div class="c-param-labels">
+                        <span>Soft Margin<br>(Wide street)</span>
+                        <span>Hard Margin<br>(Narrow street)</span>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: var(--space-md);">
+                        💡 Low C = Allow more errors for wider margin<br>
+                        High C = Strict classification, narrower margin
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">📊 Statistics</span>
+                </div>
+                <div class="panel-content">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-points">0</div>
+                            <div class="stat-label">Total Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="misclassified">0</div>
+                            <div class="stat-label">Misclassified</div>
+                        </div>
+                    </div>
+                    <div class="accuracy-display" style="margin-top: var(--space-md);">
+                        <div class="accuracy-value good" id="accuracy-value">100%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>Supervised</span>
+                <div class="nav-dropdown">
+                    <a href="linear-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📈</span>
+                        Linear Regression
+                    </a>
+                    <a href="logistic-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📊</span>
+                        Logistic Regression
+                    </a>
+                    <a href="decision-trees.html" class="dropdown-item">
+                        <span class="dropdown-icon">🌳</span>
+                        Decision Trees
+                    </a>
+                    <a href="svm.html" class="dropdown-item" style="background: rgba(102, 126, 234, 0.2);">
+                        <span class="dropdown-icon">⚡</span>
+                        SVM
+                    </a>
+                    <a href="knn.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        KNN
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                <span>Unsupervised</span>
+                <div class="nav-dropdown">
+                    <a href="kmeans.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎨</span>
+                        K-Means Clustering
+                    </a>
+                    <a href="association.html" class="dropdown-item">
+                        <span class="dropdown-icon">🛒</span>
+                        Association Rules
+                    </a>
+                </div>
+            </div>
+            
+            <a href="../quiz.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="../script.js"></script>
+    <script src="../education-system.js"></script>
+    <script src="svm.js"></script>
+
+    <script>
+ window.difyChatbotConfig = {
+  token: '2kOuMUhfJnMKcqol',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="2kOuMUhfJnMKcqol"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+    position: fixed !important;
+    bottom: 6rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+</style>
+
+</body>
+</html>

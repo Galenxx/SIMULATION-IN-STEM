@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistic Regression Lab - ML Playground</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../education-system.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Lab-specific styles */
+        .view-toggle {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .view-btn {
+            flex: 1;
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+        
+        .view-btn:hover {
+            border-color: var(--color-border-hover);
+            color: var(--color-text);
+        }
+        
+        .view-btn.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .probability-display {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .prob-bar {
+            flex: 1;
+            height: 24px;
+            background: var(--color-surface);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-red), var(--color-yellow), var(--color-green));
+            transition: width var(--transition-base);
+            border-radius: var(--radius-full);
+        }
+        
+        .prob-marker {
+            position: absolute;
+            top: -8px;
+            width: 4px;
+            height: 40px;
+            background: white;
+            border-radius: 2px;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: left var(--transition-base);
+        }
+        
+        .prob-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: var(--space-xs);
+        }
+        
+        .prediction-result {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .prediction-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .prediction-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .prediction-value.pass {
+            color: var(--color-green);
+        }
+        
+        .prediction-value.fail {
+            color: var(--color-red);
+        }
+        
+        .threshold-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-md);
+        }
+        
+        .threshold-indicator svg {
+            color: var(--color-yellow);
+        }
+        
+        .accuracy-meter {
+            margin-top: var(--space-lg);
+        }
+        
+        .accuracy-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .accuracy-bar {
+            height: 8px;
+            background: var(--color-surface);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .accuracy-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width var(--transition-base);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="lab-layout">
+        <header class="lab-header">
+            <div class="lab-breadcrumb">
+                <a href="../index.html">Home</a>
+                <span>/</span>
+                <a href="../index.html#labs">Labs</a>
+                <span>/</span>
+                <span>Logistic Regression</span>
+            </div>
+            <h1>Logistic Regression Lab</h1>
+            <p>Predict exam outcomes using the power of the Sigmoid function</p>
+        </header>
+        
+        <section class="canvas-container">
+            <div class="canvas-header">
+                <span class="canvas-title" id="canvas-title">1D Sigmoid View</span>
+                <div class="canvas-actions">
+                    <button class="canvas-btn" data-action="generate">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                        </svg>
+                        New Data
+                    </button>
+                    <button class="canvas-btn" data-action="clear">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <canvas id="main-canvas" class="main-canvas"></canvas>
+        </section>
+        
+        <aside class="dashboard">
+            <!-- Guide - NOW AT TOP -->
+            <div class="panel guide-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📖 User Guide</span>
+                </div>
+                <div class="narrative">
+                    <div class="narrative-step active" data-view="1d">
+                        <h3>1D Sigmoid View</h3>
+                        <p><strong>Scenario:</strong> Predict if a student passes based on study hours.</p>
+                        <p><strong>Red dots</strong> = Failed students (bottom)<br>
+                           <strong>Green dots</strong> = Passed students (top)</p>
+                        <p><strong>Drag the curve</strong> or use sliders to adjust:</p>
+                        <ul style="color: var(--color-text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+                            <li><strong>Weight:</strong> Controls curve steepness</li>
+                            <li><strong>Bias:</strong> Shifts the curve left/right</li>
+                        </ul>
+                        <p style="color: var(--color-yellow);">💡 Hover over the canvas to see predictions at different study hours!</p>
+                    </div>
+                    <div class="narrative-step" data-view="2d">
+                        <h3>2D Decision Boundary</h3>
+                        <p><strong>New feature:</strong> Now we consider both <strong>Study Hours</strong> (X) and <strong>Sleep Hours</strong> (Y).</p>
+                        <p>The <strong>decision boundary</strong> is a line that separates Pass (green) from Fail (red) regions.</p>
+                        <p><strong>Drag the line</strong> to rotate and position it. Watch the background gradient show probability regions!</p>
+                        <p>Adjust the <strong>Threshold</strong> slider to change the classification cutoff.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- View Toggle -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">View Mode</span>
+                </div>
+                <div class="panel-content">
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="1d">1D Sigmoid</button>
+                        <button class="view-btn" data-view="2d">2D Boundary</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sigmoid Parameters (1D View) -->
+            <div class="panel" id="params-1d">
+                <div class="panel-header">
+                    <span class="panel-title">📐 Sigmoid Parameters</span>
+                </div>
+                <div class="panel-content">
+                    <div class="formula-display">
+                        P(pass) = 1 / (1 + e<sup>-(wx + b)</sup>)
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Weight (w) - Steepness</span>
+                            <span class="slider-value" id="weight-value">1.00</span>
+                        </div>
+                        <input type="range" id="weight-slider" min="0.1" max="3" step="0.1" value="1">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Bias (b) - Shift</span>
+                            <span class="slider-value" id="bias-value">-5.00</span>
+                        </div>
+                        <input type="range" id="bias-slider" min="-10" max="0" step="0.1" value="-5">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2D Parameters -->
+            <div class="panel" id="params-2d" style="display: none;">
+                <div class="panel-header">
+                    <span class="panel-title">📐 Decision Boundary</span>
+                </div>
+                <div class="panel-content">
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Boundary Angle</span>
+                            <span class="slider-value" id="angle-value">45°</span>
+                        </div>
+                        <input type="range" id="angle-slider" min="0" max="180" step="1" value="45">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Boundary Position</span>
+                            <span class="slider-value" id="position-value">50%</span>
+                        </div>
+                        <input type="range" id="position-slider" min="10" max="90" step="1" value="50">
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Threshold</span>
+                            <span class="slider-value" id="threshold-value">0.50</span>
+                        </div>
+                        <input type="range" id="threshold-slider" min="0.1" max="0.9" step="0.05" value="0.5">
+                    </div>
+                    <div class="threshold-indicator">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4M12 8h.01"/>
+                        </svg>
+                        <span style="font-size: 0.8rem; color: var(--color-text-secondary);">
+                            Points with P > threshold are classified as "Pass"
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prediction Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🎯 Live Prediction</span>
+                </div>
+                <div class="panel-content">
+                    <div class="probability-display">
+                        <span style="font-size: 0.75rem; color: var(--color-red);">Fail</span>
+                        <div class="prob-bar">
+                            <div class="prob-fill" id="prob-fill" style="width: 50%"></div>
+                            <div class="prob-marker" id="prob-marker" style="left: 50%"></div>
+                        </div>
+                        <span style="font-size: 0.75rem; color: var(--color-green);">Pass</span>
+                    </div>
+                    <div class="prob-labels">
+                        <span>0%</span>
+                        <span>50%</span>
+                        <span>100%</span>
+                    </div>
+                    
+                    <div class="prediction-result">
+                        <div class="prediction-label">Prediction</div>
+                        <div class="prediction-value pass" id="prediction-text">PASS</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="study-hours">5.0</div>
+                            <div class="stat-label">Study Hours</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="probability">50%</div>
+                            <div class="stat-label">Probability</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accuracy Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">📊 Model Accuracy</span>
+                </div>
+                <div class="panel-content">
+                    <div class="accuracy-meter">
+                        <div class="accuracy-value" id="accuracy-value">--</div>
+                        <div class="accuracy-bar">
+                            <div class="accuracy-fill" id="accuracy-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="stats-grid" style="margin-top: var(--space-lg);">
+                        <div class="stat-item">
+                            <div class="stat-value" id="correct-count">0</div>
+                            <div class="stat-label">Correct</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-count">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>Supervised</span>
+                <div class="nav-dropdown">
+                    <a href="linear-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📈</span>
+                        Linear Regression
+                    </a>
+                    <a href="logistic-regression.html" class="dropdown-item" style="background: rgba(102, 126, 234, 0.2);">
+                        <span class="dropdown-icon">📊</span>
+                        Logistic Regression
+                    </a>
+                    <a href="decision-trees.html" class="dropdown-item">
+                        <span class="dropdown-icon">🌳</span>
+                        Decision Trees
+                    </a>
+                    <a href="svm.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚡</span>
+                        SVM
+                    </a>
+                    <a href="knn.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        KNN
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                <span>Unsupervised</span>
+                <div class="nav-dropdown">
+                    <a href="kmeans.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎨</span>
+                        K-Means Clustering
+                    </a>
+                    <a href="association.html" class="dropdown-item">
+                        <span class="dropdown-icon">🛒</span>
+                        Association Rules
+                    </a>
+                </div>
+            </div>
+            
+            <a href="../quiz.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="../script.js"></script>
+    <script src="../education-system.js"></script>
+    <script src="logistic-regression.js"></script>
+
+<script>
+ window.difyChatbotConfig = {
+  token: '2kOuMUhfJnMKcqol',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="2kOuMUhfJnMKcqol"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+    position: fixed !important;
+    bottom: 6rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+</style>
+
+</body>
+</html>

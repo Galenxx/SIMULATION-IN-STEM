@@ -1,0 +1,1296 @@
+/* ========================================
+   ML Playground - Education Enhancement Styles
+   ======================================== */
+
+/* ========================================
+   1. Tour Guide Styles
+   ======================================== */
+.tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tour-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tour-spotlight {
+    position: absolute;
+    border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.tour-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
+    border: 1px solid rgba(102, 126, 234, 0.5);
+    border-radius: 16px;
+    padding: 0;
+    max-width: 380px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(102, 126, 234, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.9) translateY(10px);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tour-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+}
+
+.tour-tooltip-content {
+    padding: 24px;
+}
+
+.tour-step-indicator {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #667eea;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.tour-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.tour-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.tour-description strong {
+    color: white;
+}
+
+.tour-description em {
+    color: #f59e0b;
+    font-style: normal;
+}
+
+.tour-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tour-nav {
+    display: flex;
+    gap: 8px;
+}
+
+.tour-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-family: inherit;
+}
+
+.tour-btn.tour-skip {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.tour-btn.tour-skip:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.tour-btn.tour-prev,
+.tour-btn.tour-next {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.tour-btn.tour-prev:hover,
+.tour-btn.tour-next:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.tour-btn.tour-prev:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.tour-btn.tour-next.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tour-btn.tour-next.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Tour Arrow */
+.tour-arrow {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #1a1a24;
+    border: 1px solid rgba(102, 126, 234, 0.5);
+    transform: rotate(45deg);
+}
+
+.tour-arrow.arrow-top {
+    top: -9px;
+    left: 50%;
+    margin-left: -8px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.tour-arrow.arrow-bottom {
+    bottom: -9px;
+    left: 50%;
+    margin-left: -8px;
+    border-left: none;
+    border-top: none;
+}
+
+.tour-arrow.arrow-left {
+    left: -9px;
+    top: 50%;
+    margin-top: -8px;
+    border-right: none;
+    border-top: none;
+}
+
+.tour-arrow.arrow-right {
+    right: -9px;
+    top: 50%;
+    margin-top: -8px;
+    border-left: none;
+    border-bottom: none;
+}
+
+/* Tour Highlight Effect */
+.tour-highlight {
+    animation: tourPulse 0.5s ease;
+}
+
+@keyframes tourPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+}
+
+/* Start Tour Button */
+.start-tour-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 16px auto;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.start-tour-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(102, 126, 234, 0.5);
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+}
+
+/* Tour Complete Message */
+.tour-complete-msg {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: rgba(16, 185, 129, 0.95);
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideUp 0.4s ease;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+}
+
+.tour-complete-msg.fade-out {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.tour-complete-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #10b981;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+body.tour-active {
+    overflow: hidden;
+}
+
+/* ========================================
+   2. Parameter Explanation Styles
+   ======================================== */
+.param-explanation {
+    position: fixed;
+    z-index: 1000;
+    max-width: 320px;
+    background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(245, 158, 11, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.param-explanation.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.param-explanation-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.param-explanation-icon {
+    font-size: 1.25rem;
+}
+
+.param-explanation-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+.param-explanation-content {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.param-explanation-content strong {
+    color: white;
+}
+
+.param-explanation-content em {
+    color: #667eea;
+    font-style: normal;
+}
+
+.param-explanation-impact {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.param-explanation-impact strong {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========================================
+   3. Achievement System Styles
+   ======================================== */
+
+/* Achievement Nav Button */
+.achievement-nav {
+    position: relative;
+}
+
+.achievement-badge-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* Achievement Modal */
+.achievement-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.achievement-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.achievement-modal-content {
+    background: linear-gradient(180deg, #1a1a24 0%, #0a0a0f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.achievement-modal.active .achievement-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.achievement-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.achievement-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.achievement-modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.achievement-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.achievement-modal-body {
+    padding: 28px;
+    overflow-y: auto;
+    max-height: calc(90vh - 100px);
+}
+
+/* Achievement Overview */
+.achievement-overview {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+}
+
+.achievement-overview-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 16px;
+}
+
+.overview-stat {
+    text-align: center;
+}
+
+.overview-stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+.overview-stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.overview-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Progress Bar */
+.achievement-progress-bar {
+    position: relative;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.achievement-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f59e0b 100%);
+    border-radius: 6px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.achievement-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 100%
+    );
+    animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.achievement-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.05em;
+}
+
+/* Achievement Section */
+.achievement-section {
+    margin-bottom: 24px;
+}
+
+/* Grandmaster Card */
+.achievement-grandmaster {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0.02) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.25);
+    border-radius: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.achievement-grandmaster.locked {
+    background: linear-gradient(135deg, rgba(50, 50, 60, 0.5) 0%, rgba(30, 30, 40, 0.5) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.achievement-grandmaster.locked .grandmaster-icon-wrapper {
+    filter: grayscale(1) brightness(0.5);
+}
+
+.achievement-grandmaster.locked .grandmaster-info h3,
+.achievement-grandmaster.locked .grandmaster-info p {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.achievement-grandmaster.unlocked {
+    border-color: #ffd700;
+    animation: grandmasterGlow 2s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%);
+}
+
+@keyframes grandmasterGlow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.5); }
+}
+
+.grandmaster-icon-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.grandmaster-icon {
+    font-size: 3rem;
+    filter: drop-shadow(0 4px 10px rgba(255, 215, 0, 0.4));
+    z-index: 2;
+    position: relative;
+}
+
+.grandmaster-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: gmGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes gmGlowPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+.grandmaster-info {
+    flex: 1;
+}
+
+.grandmaster-info h3 {
+    font-size: 1.25rem;
+    color: #ffd700;
+    margin-bottom: 4px;
+}
+
+.grandmaster-info p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+.grandmaster-progress {
+    margin-top: 8px;
+}
+
+.grandmaster-progress-text {
+    font-size: 0.75rem;
+    color: rgba(255, 215, 0, 0.7);
+    font-weight: 500;
+}
+
+.unlocked-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    animation: badgeShine 2s infinite;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+@keyframes badgeShine {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 4px 30px rgba(255, 215, 0, 0.7); }
+}
+
+/* Section Title */
+.achievement-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.achievement-section-title svg {
+    opacity: 0.6;
+}
+
+/* Achievement Footer */
+.achievement-footer {
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+.achievement-footer p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+}
+
+/* Achievement Grid */
+.achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Locked State - Grayscale with reduced opacity */
+.achievement-card.locked {
+    filter: grayscale(1) brightness(0.7);
+    opacity: 0.6;
+}
+
+.achievement-card.locked::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.achievement-card.locked .achievement-card-icon {
+    position: relative;
+}
+
+/* Lock Icon Overlay for Locked Cards */
+.achievement-card.locked .achievement-card-icon::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    z-index: 2;
+}
+
+/* Silhouette effect for locked icons */
+.achievement-card.locked .achievement-card-icon > span {
+    filter: blur(1px) brightness(0.3);
+}
+
+/* Unlocked State - Full Color with Glow */
+.achievement-card.unlocked {
+    border-color: rgba(16, 185, 129, 0.6);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.achievement-card.unlocked::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 60%
+    );
+    animation: achievementShine 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes achievementShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Unlock Animation */
+.achievement-card.just-unlocked {
+    animation: achievementUnlock 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes achievementUnlock {
+    0% { 
+        transform: scale(0.8); 
+        filter: grayscale(1) brightness(0.5);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.1); 
+        filter: grayscale(0) brightness(1.2);
+    }
+    100% { 
+        transform: scale(1); 
+        filter: grayscale(0) brightness(1);
+        opacity: 1;
+    }
+}
+
+.achievement-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.achievement-card.unlocked:hover {
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
+}
+
+.achievement-card-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-size: 2rem;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.achievement-card.unlocked .achievement-card-icon {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.achievement-card-info {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.achievement-card-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    transition: color 0.3s ease;
+}
+
+.achievement-card.locked .achievement-card-info h4 {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.achievement-card.unlocked .achievement-card-info h4 {
+    color: #10b981;
+}
+
+.achievement-card-info p {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+}
+
+.achievement-card.locked .achievement-card-info p {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.achievement-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.achievement-card.unlocked .achievement-status {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.achievement-card.locked .achievement-status {
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Progress indicator for locked badges */
+.achievement-progress-mini {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.achievement-progress-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+/* Badge Unlocked Notification - Enhanced Toast */
+.badge-unlocked-notification {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-150px) scale(0.8);
+    z-index: 10001;
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.badge-unlocked-notification.active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.badge-unlocked-notification.exit {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50px) scale(0.9);
+}
+
+.badge-unlocked-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, #1e1e2e 0%, #141420 100%);
+    border: 2px solid;
+    border-image: linear-gradient(135deg, #10b981, #667eea, #f59e0b) 1;
+    border-radius: 20px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(16, 185, 129, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-unlocked-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: toastShine 2s ease-in-out infinite;
+}
+
+@keyframes toastShine {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+}
+
+/* Celebration particles around toast */
+.badge-unlocked-notification .celebration-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.badge-unlocked-notification .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: particleBurst 1s ease-out forwards;
+}
+
+@keyframes particleBurst {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(0);
+        opacity: 0;
+    }
+}
+
+.badge-unlocked-icon {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    font-size: 2.25rem;
+    position: relative;
+    animation: iconBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.badge-unlocked-icon .badge-icon-emoji {
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.badge-unlocked-icon .badge-icon-ring {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 22px;
+    animation: ringPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.8;
+    }
+}
+
+@keyframes iconBounce {
+    0% { transform: scale(0) rotate(-20deg); }
+    60% { transform: scale(1.15) rotate(5deg); }
+    80% { transform: scale(0.95) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.badge-unlocked-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.badge-unlocked-label {
+    font-size: 0.8rem;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-unlocked-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(90deg, #fff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.badge-unlocked-desc {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Confetti Animation */
+.achievement-confetti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -20px;
+    left: var(--x);
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    animation: confettiFall var(--duration) ease-out var(--delay) forwards;
+}
+
+.confetti-piece.square {
+    border-radius: 2px;
+    transform: rotate(var(--rotation));
+}
+
+.confetti-piece.circle {
+    border-radius: 50%;
+}
+
+@keyframes confettiFall {
+    0% {
+        opacity: 1;
+        top: -20px;
+        transform: translateX(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        top: 100vh;
+        transform: translateX(calc(var(--x) * 0.2 - 50px)) rotate(720deg);
+    }
+}
+
+/* Nav Badge Pulse Animation */
+.achievement-badge-count.pulse {
+    animation: badgePulse 0.5s ease;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+}
+
+/* Grandmaster Unlocked Modal */
+.grandmaster-unlocked-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.grandmaster-unlocked-notification.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.grandmaster-unlocked-content {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
+    border: 2px solid #ffd700;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    animation: grandmasterPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes grandmasterPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.grandmaster-unlocked-content .grandmaster-icon {
+    font-size: 5rem;
+    margin-bottom: 24px;
+    animation: crownFloat 2s ease-in-out infinite;
+}
+
+@keyframes crownFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.grandmaster-unlocked-content h2 {
+    font-size: 2rem;
+    color: #ffd700;
+    margin-bottom: 12px;
+}
+
+.grandmaster-unlocked-content p {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 8px;
+}
+
+.grandmaster-subtitle {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.9375rem !important;
+}
+
+.grandmaster-close-btn {
+    margin-top: 28px;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.grandmaster-close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+}
+
+/* ========================================
+   4. Guide Panel Highlight (Top of Sidebar)
+   ======================================== */
+.guide-panel {
+    order: -1 !important;
+    border: 1px solid rgba(102, 126, 234, 0.3) !important;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(18, 18, 26, 0.8) 100%) !important;
+}
+
+.guide-panel .panel-header {
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, transparent 100%) !important;
+}
+
+.guide-panel .panel-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #667eea;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: guidePulse 2s infinite;
+}
+
+@keyframes guidePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 8px rgba(102, 126, 234, 0); }
+}
+
+/* ========================================
+   5. Responsive Adjustments
+   ======================================== */
+@media (max-width: 768px) {
+    .tour-tooltip {
+        max-width: calc(100vw - 32px);
+        left: 16px !important;
+        right: 16px;
+    }
+    
+    .param-explanation {
+        position: fixed;
+        bottom: 80px;
+        left: 16px;
+        right: 16px;
+        top: auto !important;
+        max-width: none;
+        transform: translateY(20px);
+    }
+    
+    .param-explanation.active {
+        transform: translateY(0);
+    }
+    
+    .achievement-modal-content {
+        width: 95%;
+        margin: 16px;
+    }
+    
+    .achievement-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .badge-unlocked-notification {
+        top: auto;
+        bottom: 80px;
+        left: 16px;
+        right: 16px;
+    }
+    
+    .start-tour-btn {
+        width: calc(100% - 32px);
+        justify-content: center;
+    }
+}

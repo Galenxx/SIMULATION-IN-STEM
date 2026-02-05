@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Means Clustering Lab - ML Playground</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../education-system.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* K-Means Lab specific styles */
+        .step-controls {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .step-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .step-btn:hover:not(:disabled) {
+            border-color: var(--color-border-hover);
+            color: var(--color-text);
+        }
+        
+        .step-btn.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .step-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .step-btn .step-number {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-surface);
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .step-btn.active .step-number {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .step-btn.completed .step-number {
+            background: var(--color-green);
+            color: white;
+        }
+        
+        .iteration-display {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .iteration-value {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .iteration-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .k-selector {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .k-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .k-btns {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+        
+        .k-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .k-btn:hover {
+            background: var(--color-border-hover);
+        }
+        
+        .centroid-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .centroid-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--color-bg);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+        }
+        
+        .centroid-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .convergence-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .convergence-indicator.running {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--color-yellow);
+        }
+        
+        .convergence-indicator.converged {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--color-green);
+        }
+        
+        .convergence-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+        
+        .convergence-indicator.running .convergence-dot {
+            background: var(--color-yellow);
+        }
+        
+        .convergence-indicator.converged .convergence-dot {
+            background: var(--color-green);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        
+        .wcss-display {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+        }
+        
+        .wcss-value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-blue);
+        }
+        
+        .wcss-label {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+        }
+        
+        .auto-run-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md);
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-md);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--color-surface);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        
+        .toggle-switch.active {
+            background: var(--color-green);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--transition-fast);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(22px);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <div class="lab-layout">
+        <header class="lab-header">
+            <div class="lab-breadcrumb">
+                <a href="../index.html">Home</a>
+                <span>/</span>
+                <a href="../index.html#labs">Labs</a>
+                <span>/</span>
+                <span>K-Means Clustering</span>
+            </div>
+            <h1>K-Means Clustering Lab</h1>
+            <p>Watch the algorithm walk through data, step by step</p>
+        </header>
+        
+        <section class="canvas-container">
+            <div class="canvas-header">
+                <span class="canvas-title">Clustering Canvas</span>
+                <div class="canvas-actions">
+                    <button class="canvas-btn" data-action="random-points">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <circle cx="19" cy="5" r="2"/>
+                            <circle cx="5" cy="19" r="2"/>
+                        </svg>
+                        Random Points
+                    </button>
+                    <button class="canvas-btn" data-action="clusters">
+                        Clustered Data
+                    </button>
+                    <button class="canvas-btn" data-action="clear">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            <canvas id="main-canvas" class="main-canvas"></canvas>
+        </section>
+        
+        <aside class="dashboard">
+            <!-- Guide - NOW AT TOP -->
+            <div class="panel guide-panel">
+                <div class="panel-header">
+                    <span class="panel-title">📖 User Guide</span>
+                </div>
+                <div class="narrative">
+                    <div class="narrative-step active">
+                        <h3>How K-Means Works</h3>
+                        <p><strong>Setup:</strong> Click canvas to add gray points, then click "Place Random Centroids".</p>
+                        <p><strong>Step 1 - Assign:</strong> Each point turns the color of its nearest centroid.</p>
+                        <p><strong>Step 2 - Update:</strong> Each centroid moves to the center of its colored points.</p>
+                        <p><strong>Repeat</strong> until centroids stop moving!</p>
+                        <p style="color: var(--color-yellow);">💡 Watch the ghost trails show where centroids used to be!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- K Parameter -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🔢 Number of Clusters (K)</span>
+                </div>
+                <div class="panel-content">
+                    <div class="k-selector">
+                        <div class="k-btns">
+                            <button class="k-btn" data-action="k-up">+</button>
+                            <button class="k-btn" data-action="k-down">−</button>
+                        </div>
+                        <div class="k-value" id="k-value">3</div>
+                        <div style="flex: 1;">
+                            <input type="range" id="k-slider" min="2" max="8" value="3">
+                        </div>
+                    </div>
+                    <button class="canvas-btn" data-action="init-centroids" style="width: 100%;">
+                        🎯 Place Random Centroids
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step Controls -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🚶 Algorithm Steps</span>
+                </div>
+                <div class="panel-content">
+                    <div class="step-controls">
+                        <button class="step-btn" id="step-assign" data-step="assign" disabled>
+                            <span class="step-number">1</span>
+                            <span>Assign Points</span>
+                        </button>
+                        <button class="step-btn" id="step-update" data-step="update" disabled>
+                            <span class="step-number">2</span>
+                            <span>Update Centroids</span>
+                        </button>
+                    </div>
+                    
+                    <div class="auto-run-toggle">
+                        <span style="font-size: 0.8rem; color: var(--color-text-secondary);">Auto-run until convergence</span>
+                        <div class="toggle-switch" id="auto-toggle"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Iteration Counter -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">📊 Progress</span>
+                </div>
+                <div class="panel-content">
+                    <div class="iteration-display">
+                        <div class="iteration-value" id="iteration-value">0</div>
+                        <div class="iteration-label">Iteration</div>
+                    </div>
+                    
+                    <div class="convergence-indicator running" id="convergence-indicator">
+                        <div class="convergence-dot"></div>
+                        <span id="convergence-text">Waiting to start...</span>
+                    </div>
+                    
+                    <div class="wcss-display">
+                        <div class="wcss-value" id="wcss-value">--</div>
+                        <div class="wcss-label">Within-Cluster Sum of Squares</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Centroid Legend -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">🎨 Cluster Colors</span>
+                </div>
+                <div class="panel-content">
+                    <div class="centroid-legend" id="centroid-legend">
+                        <!-- Generated by JS -->
+                    </div>
+                    <div class="stats-grid" style="margin-top: var(--space-md);">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-points">0</div>
+                            <div class="stat-label">Total Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="unassigned-count">0</div>
+                            <div class="stat-label">Unassigned</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>Supervised</span>
+                <div class="nav-dropdown">
+                    <a href="linear-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📈</span>
+                        Linear Regression
+                    </a>
+                    <a href="logistic-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📊</span>
+                        Logistic Regression
+                    </a>
+                    <a href="decision-trees.html" class="dropdown-item">
+                        <span class="dropdown-icon">🌳</span>
+                        Decision Trees
+                    </a>
+                    <a href="svm.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚡</span>
+                        SVM
+                    </a>
+                    <a href="knn.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        KNN
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                <span>Unsupervised</span>
+                <div class="nav-dropdown">
+                    <a href="kmeans.html" class="dropdown-item" style="background: rgba(102, 126, 234, 0.2);">
+                        <span class="dropdown-icon">🎨</span>
+                        K-Means Clustering
+                    </a>
+                    <a href="association.html" class="dropdown-item">
+                        <span class="dropdown-icon">🛒</span>
+                        Association Rules
+                    </a>
+                </div>
+            </div>
+            
+            <a href="../quiz.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="../script.js"></script>
+    <script src="../education-system.js"></script>
+    <script src="kmeans.js"></script>
+
+<script>
+ window.difyChatbotConfig = {
+  token: '2kOuMUhfJnMKcqol',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="2kOuMUhfJnMKcqol"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+    position: fixed !important;
+    bottom: 6rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+</style>
+
+</body>
+</html>

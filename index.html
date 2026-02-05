@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Playground - Interactive Machine Learning</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="education-system.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Generative Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">Interactive Learning Platform</div>
+                <h1 class="hero-title">
+                    Explore <span class="gradient-text">Machine Learning</span>
+                    <br>Through Play
+                </h1>
+                <p class="hero-subtitle">
+                    Discover the beauty of algorithms through hands-on interactive visualizations. 
+                    No prerequisites needed—just curiosity.
+                </p>
+                <div class="hero-cta">
+                    <a href="#labs" class="btn btn-primary magnetic">
+                        <span>Start Learning</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#about" class="btn btn-secondary magnetic">
+                        <span>How It Works</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <canvas id="hero-canvas"></canvas>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about-section">
+            <div class="section-header">
+                <h2>Learning by Doing</h2>
+                <p>Our interactive labs let you experiment with real ML algorithms</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card magnetic" data-tilt>
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <h3>Real-time Feedback</h3>
+                    <p>See how your actions affect the algorithm instantly with live visualizations and metrics.</p>
+                </div>
+                <div class="feature-card magnetic" data-tilt>
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                        </svg>
+                    </div>
+                    <h3>Hands-on Labs</h3>
+                    <p>Click, drag, and manipulate data points. Build intuition through direct interaction.</p>
+                </div>
+                <div class="feature-card magnetic" data-tilt>
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                    </div>
+                    <h3>Visual Storytelling</h3>
+                    <p>Complex math becomes simple when you can see it in action. Every formula comes alive.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Labs Section -->
+        <section id="labs" class="labs-section">
+            <div class="section-header">
+                <h2>Interactive Labs</h2>
+                <p>Choose your learning path</p>
+            </div>
+            
+            <div class="labs-category">
+                <h3 class="category-title">
+                    <span class="category-icon supervised"></span>
+                    Supervised Learning
+                </h3>
+                <div class="labs-grid">
+                    <a href="labs/linear-regression.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="linear"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>Linear Regression</h4>
+                            <p>Fit lines to data & understand least squares</p>
+                            <span class="lab-difficulty beginner">Beginner</span>
+                        </div>
+                    </a>
+                    <a href="labs/logistic-regression.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="logistic"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>Logistic Regression</h4>
+                            <p>Binary classification with sigmoid curves</p>
+                            <span class="lab-difficulty beginner">Beginner</span>
+                        </div>
+                    </a>
+                    <a href="labs/decision-trees.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="tree"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>Decision Trees</h4>
+                            <p>Sort data with if-then rules</p>
+                            <span class="lab-difficulty intermediate">Intermediate</span>
+                        </div>
+                    </a>
+                    <a href="labs/svm.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="svm"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>Support Vector Machines</h4>
+                            <p>Find the widest street between classes</p>
+                            <span class="lab-difficulty intermediate">Intermediate</span>
+                        </div>
+                    </a>
+                    <a href="labs/knn.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="knn"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>K-Nearest Neighbors</h4>
+                            <p>Classification by proximity voting</p>
+                            <span class="lab-difficulty beginner">Beginner</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="labs-category">
+                <h3 class="category-title">
+                    <span class="category-icon unsupervised"></span>
+                    Unsupervised Learning
+                </h3>
+                <div class="labs-grid">
+                    <a href="labs/kmeans.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="kmeans"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>K-Means Clustering</h4>
+                            <p>Group similar data points automatically</p>
+                            <span class="lab-difficulty beginner">Beginner</span>
+                        </div>
+                    </a>
+                    <a href="labs/association.html" class="lab-card magnetic" data-tilt>
+                        <div class="lab-preview">
+                            <canvas class="lab-preview-canvas" data-preview="association"></canvas>
+                        </div>
+                        <div class="lab-info">
+                            <h4>Association Rules</h4>
+                            <p>Discover hidden patterns in transactions</p>
+                            <span class="lab-difficulty intermediate">Intermediate</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="quiz-section">
+            <div class="quiz-card magnetic">
+                <div class="quiz-content">
+                    <h2>Test Your Knowledge</h2>
+                    <p>Challenge yourself with interactive quizzes tailored to each algorithm</p>
+                    <a href="quiz.html" class="btn btn-primary magnetic">
+                        <span>Start Quiz</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                </div>
+                <div class="quiz-visual">
+                    <div class="quiz-icon">?</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-item active magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span>Home</span>
+            </a>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <span>Supervised</span>
+                <div class="nav-dropdown">
+                    <a href="labs/linear-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📈</span>
+                        Linear Regression
+                    </a>
+                    <a href="labs/logistic-regression.html" class="dropdown-item">
+                        <span class="dropdown-icon">📊</span>
+                        Logistic Regression
+                    </a>
+                    <a href="labs/decision-trees.html" class="dropdown-item">
+                        <span class="dropdown-icon">🌳</span>
+                        Decision Trees
+                    </a>
+                    <a href="labs/svm.html" class="dropdown-item">
+                        <span class="dropdown-icon">⚡</span>
+                        SVM
+                    </a>
+                    <a href="labs/knn.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎯</span>
+                        KNN
+                    </a>
+                </div>
+            </div>
+            
+            <div class="nav-item has-dropdown magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <circle cx="19" cy="12" r="2"/>
+                    <circle cx="5" cy="12" r="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                </svg>
+                <span>Unsupervised</span>
+                <div class="nav-dropdown">
+                    <a href="labs/kmeans.html" class="dropdown-item">
+                        <span class="dropdown-icon">🎨</span>
+                        K-Means Clustering
+                    </a>
+                    <a href="labs/association.html" class="dropdown-item">
+                        <span class="dropdown-icon">🛒</span>
+                        Association Rules
+                    </a>
+                </div>
+            </div>
+            
+            <a href="quiz.html" class="nav-item magnetic">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Quiz</span>
+            </a>
+        </div>
+    </nav>
+
+<script>
+ window.difyChatbotConfig = {
+  token: '2kOuMUhfJnMKcqol',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="2kOuMUhfJnMKcqol"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+    position: fixed !important;
+    bottom: 6rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+  }
+</style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="script.js"></script>
+    <script src="education-system.js"></script>
+</body>
+</html>
